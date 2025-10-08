@@ -11,7 +11,7 @@ PromptCodeGen is a full-stack application that helps developers transform requir
 - **Backend**: Python with FastAPI and uvicorn
 - **Frontend**: React with Vite
 - **Database**: PostgreSQL (production) / SQLite (development)
-- **AI Integration**: Gemini (stubbed for now)
+ - **AI Integration**: Gemini (Google Generative AI) integrated
 
 ## Quick Start
 
@@ -29,7 +29,8 @@ Copy and configure environment variables:
 cp .env.example .env
 ```
 
-Add your Gemini API key to `.env`:
+
+Add your Gemini API key to `.env` (required for code generation):
 ```
 GEMINI_API_KEY=your_api_key_here
 APP_ENV=dev
@@ -74,7 +75,8 @@ npm run dev
 
 ## Scripts
 
-Use the provided scripts for easy development:
+
+Use the provided scripts for easy development (work on Linux/macOS and can be used on Windows via WSL or PowerShell):
 
 ```bash
 # Run backend only
@@ -96,6 +98,7 @@ Use the provided scripts for easy development:
 - **Prompt Engineering**: Pre-built snippets for different developer roles
 - **Best Practices**: Curated guidelines from markdown files
 - **Code Generation**: AI-powered code generation (Gemini integration)
+- **Visual Experience**: Frontend displays highlighted code blocks and markdown instructions, with support for bold, italic, headings, and lists for improved readability.
 - **Project Download**: Generated projects as downloadable ZIP files
 - **Dark Theme**: Toggle between light and dark themes
 - **Responsive Design**: Works on desktop and mobile devices

@@ -24,3 +24,5 @@ backend/.env
 backend/venv/
 .env
 generated_projects
+__pycache__
+/api/__pycache__
