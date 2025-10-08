@@ -31,6 +31,8 @@ export default function Generation() {
   const [error, setError] = useState<string | null>(null)
   const [generatedProject, setGeneratedProject] = useState<GeneratedProject | null>(null)
   const [selectedFile, setSelectedFile] = useState<GeneratedFile | null>(null)
+  // Estado para feedback de cópia dos blocos de código
+  const [copiedIdx, setCopiedIdx] = useState<number | null>(null)
   
   const { project, setGeneratedProject: setProjectGenerated, resetProject } = useProject()
   const navigate = useNavigate()
@@ -217,13 +219,99 @@ export default function Generation() {
               </div>
             </div>
           ) : (
-            <div className="card p-6 my-8">
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-                Conteúdo gerado
-              </h3>
-              <pre className="text-sm text-gray-800 dark:text-gray-200 whitespace-pre-wrap">
-                {generatedProject.raw_text || 'Nenhum conteúdo gerado.'}
-              </pre>
+            <div className="grid lg:grid-cols-3 gap-8 my-8">
+              {/* Blocos de código */}
+              <div className="lg:col-span-2">
+                <div className="card p-6">
+                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+                    Blocos de código gerados
+                  </h3>
+                  {(() => {
+                    const codeBlockRegex = /```(\w+)[\r\n]+([\s\S]*?)(?=```)/g;
+                    const raw = generatedProject.raw_text || '';
+                    const blocks = [];
+                    let match;
+                    while ((match = codeBlockRegex.exec(raw))) {
+                      const lang = match[1].toLowerCase();
+                      if (lang === 'bash' || lang === 'sh' || lang === 'shell') continue;
+                      blocks.push({ lang, code: match[2] });
+                    }
+                    if (blocks.length === 0) {
+                      return <pre className="text-sm text-gray-800 dark:text-gray-200 whitespace-pre-wrap">Nenhum bloco de código encontrado.</pre>;
+                    }
+                    return (
+                      <div className="space-y-6">
+                        {blocks.map((block, idx) => (
+                          <div key={idx} className="relative bg-gray-50 dark:bg-gray-900 rounded-lg p-4 border border-gray-200 dark:border-gray-800">
+                            <div className="flex items-center justify-between mb-2">
+                              <span className="font-mono text-xs px-2 py-1 rounded bg-primary-100 dark:bg-primary-900/30 text-primary-700 dark:text-primary-300">{block.lang}</span>
+                              <button
+                                className="btn-secondary text-xs px-2 py-1 rounded flex items-center"
+                                onClick={() => {
+                                  navigator.clipboard.writeText(block.code)
+                                  setCopiedIdx(idx)
+                                  setTimeout(() => setCopiedIdx(null), 1500)
+                                }}
+                              >
+                                {copiedIdx === idx ? <CheckCircle className="h-4 w-4 text-green-500 mr-1" /> : null}
+                                {copiedIdx === idx ? 'Copiado!' : 'Copiar'}
+                              </button>
+                            </div>
+                            <pre className="text-sm text-gray-800 dark:text-gray-200 whitespace-pre-wrap overflow-x-auto">
+                              {block.code}
+                            </pre>
+                          </div>
+                        ))}
+                      </div>
+                    );
+                  })()}
+                </div>
+              </div>
+              {/* Instruções/explicações */}
+              <div className="lg:col-span-1">
+                <div className="card p-6 h-full">
+                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+                    Instruções e Explicações
+                  </h3>
+                  {(() => {
+                    const raw = generatedProject.raw_text || '';
+                    // Pega tudo a partir de '### estrutura do projeto' (ou similar)
+                    const startIdx = raw.toLowerCase().indexOf('### estrutura do projeto');
+                    let instructions = '';
+                    if (startIdx !== -1) {
+                      instructions = raw.slice(startIdx);
+                    }
+                    // Remove blocos de código
+                    instructions = instructions.replace(/```(\w+)[\r\n]+([\s\S]*?)(?=```)/g, '');
+                    // Se não houver instruções, mostra mensagem
+                    if (!instructions.trim()) {
+                      return <p className="text-gray-500 dark:text-gray-400">Nenhuma instrução relevante encontrada.</p>;
+                    }
+                    // Renderiza markdown simples (negrito, itálico, títulos, listas)
+                    const lines = instructions.split(/\r?\n/).filter(l => l.trim());
+                    return (
+                      <div className="space-y-2 text-sm text-gray-800 dark:text-gray-200">
+                        {lines.map((line, idx) => {
+                          // Negrito **texto**
+                          let formatted = line.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+                          // Itálico *texto*
+                          formatted = formatted.replace(/\*(.*?)\*/g, '<em>$1</em>');
+                          if (line.startsWith('###')) {
+                            return <h4 key={idx} className="font-bold text-base mt-4 mb-2" dangerouslySetInnerHTML={{__html: formatted.replace(/^#+\s*/, '')}} />;
+                          }
+                          if (line.startsWith('##')) {
+                            return <h3 key={idx} className="font-bold text-lg mt-6 mb-2" dangerouslySetInnerHTML={{__html: formatted.replace(/^#+\s*/, '')}} />;
+                          }
+                          if (line.startsWith('- ')) {
+                            return <li key={idx} className="ml-4 list-disc" dangerouslySetInnerHTML={{__html: formatted.replace(/^-\s*/, '')}} />;
+                          }
+                          return <p key={idx} dangerouslySetInnerHTML={{__html: formatted}} />;
+                        })}
+                      </div>
+                    );
+                  })()}
+                </div>
+              </div>
             </div>
           )
         )}

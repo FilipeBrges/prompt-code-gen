@@ -66,13 +66,11 @@ async def compose_prompt(
     
     # Add final instruction
         prompt_parts.append("## Output Requirements")
-        prompt_parts.append("""Please generate a complete, functional project based on the requirements above.
-    Return the response in the following JSON format:
-    {
-        "files": [
-            {"path": "relative/file/path.ext", "content": "file content here"}
-        ]
-    }""")
+        prompt_parts.append(
+            """Please generate a complete, functional project based on the requirements above.\n" +
+            "For every code block you generate, always use triple backticks followed by the language name (e.g. ```python, ```js, ```java, etc.), and close with triple backticks.\n" +
+            "Return the response in the following JSON format:\n" +
+            "{\n    \"files\": [\n        {\"path\": \"relative/file/path.ext\", \"content\": \"file content here\"}\n    ]\n}""")
     
     final_prompt = "\n".join(prompt_parts)
     
