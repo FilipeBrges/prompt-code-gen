@@ -60,20 +60,19 @@ class GenerativeService:
         except Exception:
             return {
                 "files": [],
-                "instructions": [],
-                "commands": [],
+                "raw_text": text,
                 "error": "Não foi possível interpretar a resposta da Gemini.",
             }
 
-        return {
-            "files": data.get("files", []),
-            "instructions": data.get("instructions", []),
-            "commands": data.get("commands", []),
-        }
-
-
-if __name__ == "__main__":
-    service = GenerativeService()
-    prompt = "Crie um script Python que leia um arquivo CSV e imprima o conteúdo."
-    result = service.generate_code(prompt)
-    print(result)
+        files = data.get("files", [])
+        import logging
+        logging.info(f"Arquivos retornados: {files}")
+        # Filtra todos arquivos válidos
+        if not isinstance(files, list):
+            logging.error(f"Formato inesperado de arquivos: {files}")
+            return {"files": [], "raw_text": text}
+        valid_files = [f for f in files if isinstance(f, dict) and "path" in f and "content" in f]
+        if not valid_files:
+            logging.error(f"Nenhum arquivo válido encontrado: {files}")
+            return {"files": [], "raw_text": text}
+        return {"files": valid_files, "raw_text": text}

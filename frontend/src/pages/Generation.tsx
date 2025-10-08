@@ -21,9 +21,8 @@ interface GeneratedFile {
 interface GeneratedProject {
   project_id: string
   files: GeneratedFile[]
-  instructions: string[]
-  commands: string[]
   download_url: string
+  raw_text?: string
 }
 
 export default function Generation() {
@@ -156,103 +155,77 @@ export default function Generation() {
         )}
 
         {generated && generatedProject && (
-          <div className="grid lg:grid-cols-4 gap-6">
-            {/* Sidebar with file list */}
-            <div className="lg:col-span-1">
-              <div className="card">
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center">
-                  <File className="h-5 w-5 mr-2" />
-                  Arquivos Gerados
-                </h3>
-                <div className="space-y-2 max-h-96 overflow-y-auto">
-                  {generatedProject.files.map((file, index) => (
-                    <button
-                      key={index}
-                      onClick={() => setSelectedFile(file)}
-                      className={`
-                        w-full text-left p-2 rounded text-sm transition-colors duration-200
-                        ${selectedFile?.path === file.path
-                          ? 'bg-primary-100 dark:bg-primary-900/30 text-primary-700 dark:text-primary-300'
-                          : 'hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300'
-                        }
-                      `}
-                    >
-                      {file.path}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              {/* Instructions */}
-              {generatedProject.instructions.length > 0 && (
-                <div className="card mt-4">
-                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-                    Instruções
+          generatedProject.files && generatedProject.files.length > 0 ? (
+            <div className="grid lg:grid-cols-4 gap-6">
+              {/* Sidebar with file list */}
+              <div className="lg:col-span-1">
+                <div className="card">
+                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center">
+                    <File className="h-5 w-5 mr-2" />
+                    Arquivos Gerados
                   </h3>
-                  <ul className="space-y-2">
-                    {generatedProject.instructions.map((instruction, index) => (
-                      <li key={index} className="flex items-start text-sm">
-                        <span className="w-5 h-5 bg-primary-500 text-white rounded-full flex items-center justify-center text-xs mr-2 mt-0.5 flex-shrink-0">
-                          {index + 1}
-                        </span>
-                        <span className="text-gray-700 dark:text-gray-300">{instruction}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              )}
-
-              {/* Commands */}
-              {generatedProject.commands.length > 0 && (
-                <div className="card mt-4">
-                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-                    Comandos
-                  </h3>
-                  <div className="space-y-2">
-                    {generatedProject.commands.map((command, index) => (
-                      <code key={index} className="block bg-gray-100 dark:bg-gray-800 p-2 rounded text-sm text-gray-800 dark:text-gray-200">
-                        {command}
-                      </code>
+                  <div className="space-y-2 max-h-96 overflow-y-auto">
+                    {generatedProject.files.map((file, index) => (
+                      <button
+                        key={index}
+                        onClick={() => setSelectedFile(file)}
+                        className={`
+                          w-full text-left p-2 rounded text-sm transition-colors duration-200
+                          ${selectedFile?.path === file.path
+                            ? 'bg-primary-100 dark:bg-primary-900/30 text-primary-700 dark:text-primary-300'
+                            : 'hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300'
+                          }
+                        `}
+                      >
+                        {file.path}
+                      </button>
                     ))}
                   </div>
                 </div>
-              )}
-            </div>
-
-            {/* Main content area */}
-            <div className="lg:col-span-3">
-              <div className="card h-full">
-                <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-                    {selectedFile ? selectedFile.path : 'Selecione um arquivo'}
-                  </h3>
-                  <div className="flex space-x-2">
-                    <button
-                      onClick={handleDownload}
-                      className="btn-primary flex items-center text-sm"
-                    >
-                      <Download className="h-4 w-4 mr-2" />
-                      Download ZIP
-                    </button>
+              </div>
+              {/* Main content area */}
+              <div className="lg:col-span-3">
+                <div className="card h-full">
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                      {selectedFile ? selectedFile.path : 'Selecione um arquivo'}
+                    </h3>
+                    <div className="flex space-x-2">
+                      <button
+                        onClick={handleDownload}
+                        className="btn-primary flex items-center text-sm"
+                      >
+                        <Download className="h-4 w-4 mr-2" />
+                        Download ZIP
+                      </button>
+                    </div>
                   </div>
+                  {selectedFile ? (
+                    <div className="bg-gray-50 dark:bg-gray-900 rounded-lg p-4 h-96 overflow-auto">
+                      <pre className="text-sm text-gray-800 dark:text-gray-200 whitespace-pre-wrap">
+                        {selectedFile.content}
+                      </pre>
+                    </div>
+                  ) : (
+                    <div className="bg-gray-50 dark:bg-gray-900 rounded-lg p-8 h-96 flex items-center justify-center">
+                      <p className="text-gray-500 dark:text-gray-400">
+                        Selecione um arquivo para visualizar seu conteúdo
+                      </p>
+                    </div>
+                  )}
                 </div>
-
-                {selectedFile ? (
-                  <div className="bg-gray-50 dark:bg-gray-900 rounded-lg p-4 h-96 overflow-auto">
-                    <pre className="text-sm text-gray-800 dark:text-gray-200 whitespace-pre-wrap">
-                      {selectedFile.content}
-                    </pre>
-                  </div>
-                ) : (
-                  <div className="bg-gray-50 dark:bg-gray-900 rounded-lg p-8 h-96 flex items-center justify-center">
-                    <p className="text-gray-500 dark:text-gray-400">
-                      Selecione um arquivo para visualizar seu conteúdo
-                    </p>
-                  </div>
-                )}
               </div>
             </div>
-          </div>
+          ) : (
+            <div className="card p-6 my-8">
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+                Conteúdo gerado
+              </h3>
+              <pre className="text-sm text-gray-800 dark:text-gray-200 whitespace-pre-wrap">
+                {generatedProject.raw_text || 'Nenhum conteúdo gerado.'}
+              </pre>
+            </div>
+          )
         )}
 
         <div className="flex justify-between mt-8">

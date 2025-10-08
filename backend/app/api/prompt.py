@@ -65,15 +65,13 @@ async def compose_prompt(
         prompt_parts.append("")
     
     # Add final instruction
-    prompt_parts.append("## Output Requirements")
-    prompt_parts.append("""Please generate a complete, functional project based on the requirements above. 
+        prompt_parts.append("## Output Requirements")
+        prompt_parts.append("""Please generate a complete, functional project based on the requirements above.
     Return the response in the following JSON format:
     {
         "files": [
-            {"path": "relative/file/path.py", "content": "file content here"}
-        ],
-        "instructions": ["step 1", "step 2", "etc"],
-        "commands": ["command 1", "command 2", "etc"]
+            {"path": "relative/file/path.ext", "content": "file content here"}
+        ]
     }""")
     
     final_prompt = "\n".join(prompt_parts)

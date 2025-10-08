@@ -25,14 +25,14 @@ async def generate_code(
     try:
         # Generate code using AI service
         generative_service = GenerativeService()
-        generated_data = await generative_service.generate_code(request.prompt)
-        
+        generated_data = generative_service.generate_code(request.prompt)
+
         # Create project ZIP
         zip_path = ProjectGenerator.create_project_zip(generated_data)
-        
+
         # Generate project ID
         project_id = str(uuid.uuid4())
-        
+
         # Save to database
         db_project = GeneratedProject(
             project_id=project_id,
@@ -40,17 +40,16 @@ async def generate_code(
             files_json=json.dumps(generated_data),
             zip_path=zip_path
         )
-        
+
         db.add(db_project)
         db.commit()
         db.refresh(db_project)
-        
+
         return {
             "project_id": project_id,
             "files": generated_data.get("files", []),
-            "instructions": generated_data.get("instructions", []),
-            "commands": generated_data.get("commands", []),
-            "download_url": f"/api/download/{project_id}"
+            "download_url": f"/api/download/{project_id}",
+            "raw_text": generated_data.get("raw_text", "")
         }
         
     except Exception as e:
