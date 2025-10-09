@@ -33,10 +33,11 @@ cp .env.example .env
 Add your Gemini API key to `.env` (required for code generation):
 ```
 GEMINI_API_KEY=your_api_key_here
-APP_ENV=dev
-DATABASE_URL=postgresql://user:password@localhost:5432/promptcodegen
-PORT=8000
+APP_ENV=
+DATABASE_URL=
+PORT=
 ```
+(as per example .env)
 
 ### 2. Backend Setup
 
@@ -111,14 +112,6 @@ Use the provided scripts for easy development (work on Linux/macOS and can be us
 - `POST /api/compose-prompt` - Compose final prompt
 - `POST /api/generate-code` - Generate code from prompt
 - `GET /api/download/{project_id}` - Download generated project
-
-## Contributing
-
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Run tests: `cd backend && pytest`
-5. Submit a pull request
 
 ## License
 
