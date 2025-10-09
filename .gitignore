@@ -26,3 +26,5 @@ backend/venv/
 generated_projects
 __pycache__
 /api/__pycache__
+/services/__pycache__
+/models/__pycache__
