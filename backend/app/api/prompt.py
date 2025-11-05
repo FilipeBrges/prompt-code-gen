@@ -63,14 +63,13 @@ async def compose_prompt(
         prompt_parts.append("## Additional Instructions")
         prompt_parts.append(request.extra_instructions)
         prompt_parts.append("")
-    
-    # Add final instruction
-        prompt_parts.append("## Output Requirements")
-        prompt_parts.append(
-            """Please generate a complete, functional project based on the requirements above.\n" +
-            "For every code block you generate, always use triple backticks followed by the language name (e.g. ```python, ```js, ```java, etc.), and close with triple backticks.\n" +
-            "Return the response in the following JSON format:\n" +
-            "{\n    \"files\": [\n        {\"path\": \"relative/file/path.ext\", \"content\": \"file content here\"}\n    ]\n}""")
+    # Add final instruction (always include - not only when extra_instructions provided)
+    prompt_parts.append("## Output Requirements")
+    prompt_parts.append(
+        """Por favor, gere um projeto completo e funcional com base nos requisitos acima.\n" +
+        "Retorne principalmente o código: explicações siga o formato MD. Se for para explicar o que os blocos de codigo fazem. Evite comentar no codigo, gerar comentarios gerais ou especificos mesmo, evite.\n" +
+        "Para cada bloco de código que você gerar, use sempre três crases seguidas pelo nome da linguagem (por exemplo, python, js, ```java, etc.) e feche com três crases.\n" +
+        """)
     
     final_prompt = "\n".join(prompt_parts)
     

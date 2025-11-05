@@ -58,21 +58,34 @@ class GenerativeService:
         try:
             data = json.loads(json_str)
         except Exception:
+            # Não foi possível extrair JSON: derive instruções removendo todos os blocos de código
+            instr = re.sub(r"```[\s\S]*?```", "", text).strip()
             return {
                 "files": [],
                 "raw_text": text,
+                "instructions": instr,
                 "error": "Não foi possível interpretar a resposta da Gemini.",
             }
 
         files = data.get("files", [])
-        import logging
+        # Se a AI retornou um campo 'instructions' use ele, caso contrário derive removendo blocos de código
+        instructions = data.get("instructions")
+
         logging.info(f"Arquivos retornados: {files}")
-        # Filtra todos arquivos válidos
+        # Valida formato de arquivos
         if not isinstance(files, list):
             logging.error(f"Formato inesperado de arquivos: {files}")
-            return {"files": [], "raw_text": text}
+            instr = instructions if instructions else re.sub(r"```[\s\S]*?```", "", text).strip()
+            return {"files": [], "raw_text": text, "instructions": instr}
+
         valid_files = [f for f in files if isinstance(f, dict) and "path" in f and "content" in f]
         if not valid_files:
             logging.error(f"Nenhum arquivo válido encontrado: {files}")
-            return {"files": [], "raw_text": text}
-        return {"files": valid_files, "raw_text": text}
+            instr = instructions if instructions else re.sub(r"```[\s\S]*?```", "", text).strip()
+            return {"files": [], "raw_text": text, "instructions": instr}
+
+        # Se não houver instruções explícitas, derive juntando todo o texto fora dos blocos de código
+        if not instructions:
+            instructions = re.sub(r"```[\s\S]*?```", "", text).strip()
+
+        return {"files": valid_files, "raw_text": text, "instructions": instructions}

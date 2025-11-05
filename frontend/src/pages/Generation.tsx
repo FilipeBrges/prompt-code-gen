@@ -35,11 +35,25 @@ export default function Generation() {
 
   const { project, setGeneratedProject: setProjectGenerated, resetProject } = useProject()
   const navigate = useNavigate()
+  // Guard against duplicated calls in React StrictMode or accidental double-invokes.
+  // We use a global Set on window so the marker survives StrictMode mount/unmount cycles
+  // during development. It keys by the prompt text to allow re-generation for new prompts.
+  if (typeof window !== 'undefined' && !(window as any).__promptGenDone) {
+    ;(window as any).__promptGenDone = new Set<string>()
+  }
 
   useEffect(() => {
-    if (project.prompt) {
-      generateCode()
+    if (!project.prompt) return
+
+    const doneSet: Set<string> | undefined = typeof window !== 'undefined' ? (window as any).__promptGenDone : undefined
+    // If this prompt was already requested, skip (prevents double calls in dev StrictMode)
+    if (doneSet && doneSet.has(project.prompt)) {
+      return
     }
+
+    // Mark as requested before calling so repeated mounts won't re-trigger
+    if (doneSet) doneSet.add(project.prompt)
+    generateCode()
   }, [project.prompt])
 
   const generateCode = async () => {

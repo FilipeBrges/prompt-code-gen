@@ -49,7 +49,8 @@ async def generate_code(
             "project_id": project_id,
             "files": generated_data.get("files", []),
             "download_url": f"/api/download/{project_id}",
-            "raw_text": generated_data.get("raw_text", "")
+            "raw_text": generated_data.get("raw_text", ""),
+            "instructions": generated_data.get("instructions", "")
         }
         
     except Exception as e:
