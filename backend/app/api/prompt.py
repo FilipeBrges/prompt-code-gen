@@ -66,11 +66,13 @@ async def compose_prompt(
     # Add final instruction (always include - not only when extra_instructions provided)
     prompt_parts.append("## Output Requirements")
     prompt_parts.append(
-        """Por favor, gere um projeto completo e funcional com base nos requisitos acima.\n" +
-        "Retorne principalmente o código: explicações siga o formato MD. Se for para explicar o que os blocos de codigo fazem. Evite comentar no codigo, gerar comentarios gerais ou especificos mesmo, evite.\n" +
-        "Para cada bloco de código que você gerar, use sempre três crases seguidas pelo nome da linguagem (por exemplo, python, js, ```java, etc.) e feche com três crases.\n" +
-        """)
-    
+        """
+        Por favor, gere um projeto completo e funcional com base nos requisitos acima.
+        Retorne o código SEM comentários dentro dos blocos de código. Todas as explicações, instruções e descrições devem ser fornecidas separadamente, no campo de instruções, nunca como comentários no código.
+        Para cada bloco de código que você gerar, use sempre três crases seguidas pelo nome da linguagem (por exemplo, python, js, java, etc.) e feche com três crases.
+        Explique o funcionamento dos blocos de código apenas no campo de instruções, usando Markdown, nunca dentro do código.
+        """
+    )
     final_prompt = "\n".join(prompt_parts)
     
     return {"prompt": final_prompt}

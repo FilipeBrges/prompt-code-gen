@@ -23,6 +23,7 @@ interface GeneratedProject {
   files: GeneratedFile[]
   download_url: string
   raw_text?: string
+  instructions?: string
 }
 
 export default function Generation() {
@@ -297,29 +298,17 @@ export default function Generation() {
                     Instruções e Explicações
                   </h3>
                   {(() => {
-                    const raw = generatedProject.raw_text || ''
-                    const startIdx = raw.toLowerCase().indexOf('### estrutura do projeto')
-                    let instructions = ''
-                    if (startIdx !== -1) {
-                      instructions = raw.slice(startIdx)
-                    }
-
-                    // Remove blocos de código
-                    instructions = instructions.replace(/```(\w+)[\r\n]+([\s\S]*?)(?=```)/g, '')
-
+                    // Sempre exibe o campo instructions retornado pelo backend
+                    const instructions = generatedProject.instructions || ''
                     if (!instructions.trim()) {
                       return (
-                        <p className="text-gray-500 dark:text-gray-400">
-                          Nenhuma instrução relevante encontrada.
-                        </p>
+                        <p className="text-gray-500 dark:text-gray-400">Nenhuma instrução fornecida pela IA.</p>
                       )
                     }
-
-                    const lines = instructions.split(/\r?\n/).filter((l) => l.trim())
-
+                    const lines = instructions.split(/\r?\n/).filter((l: string) => l.trim())
                     return (
                       <div className="space-y-2 text-sm text-gray-800 dark:text-gray-200 overflow-auto break-words">
-                        {lines.map((line, idx) => {
+                        {lines.map((line: string, idx: number) => {
                           let formatted = line.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
                           formatted = formatted.replace(/\*(.*?)\*/g, '<em>$1</em>')
 
