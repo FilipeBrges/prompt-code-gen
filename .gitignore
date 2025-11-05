@@ -28,3 +28,4 @@ __pycache__
 /api/__pycache__
 /services/__pycache__
 /models/__pycache__
+/app/__pycache__
